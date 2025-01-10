@@ -1,0 +1,39 @@
+-create resource group -> create resources -> create storage account
+- data redundancy ( LRS (local redundant storage), ZRS, GRS)
+
+bronze layer-----
++ use azure data lake khi bạn muốn lưu trử file trong các folder ở các container, chuyển từ blog storage mặc định sang data lake bằng cách tick chọn  hierachy namespace khi khởi tạo storage account
++ source->linked service 1 (base Url) -> ADF -> linked service 2-> sink 
++ Cần lấy relative url đưa vào source dataset của copy activity
++ parameterized pipeline , parameterized data set
++ @{dataset().p_month}
++ foreach: copy activity @item()
++ if over>9: use this copy activity else: use that copy activiy, @greater(item(),9) 
+
+silver layer---
++ create application called service principle, mình sẽ grant the application này quyền read vs write access, còn được là storage data contributor (blob data contributor)
++ cần service principle (application) để cấp quyền read and write cho databricks vào trong azur data lake, databricks sẽ pull application đó về để có thể đọc ghi vào trong data lake, truyền secret_value, application_id, directory_id (tenant_id) vào spark conf
++ search entra id để tạo application 
+ dbutils.fs.ls("abfss://bronze@nyctaxistoragehuym.dfs.core.windows.net/")
++ Xài recursiveFileLookup để đọc tất cả file trong folder mà ko quan tâm hierachy(thư mục con của nó)
++ có 4 mode write: append, overwrite, error, ignore
++ spark:
+	split(col,"/")
+	to_date, month, year
+
+gold layer---
++ push data from silver layer (parquet format) to gold layer(delta format)
++ create tables on top of it
++ external tables: sử dụng khi chúng ta own và dữ liệu này, còn gọi là unmanaged table vì databrick sẽ ko manage nó
++ managed tables : databricks sẽ quản lý talbe này, nếu chạy lệnh drop table thì table và data sẽ bị xóa luôn
++ Cần tạo database trước khi taọ delta tables on top of data
++ Chỉ cần sử dụng spark sql là có thể query dữ liệu từ delta table
++ delta format builds on top of parquet format, parquet sau khi add transactional log (delta log) sẽ trở thành delta format
++ transactional log bao gồm 2 file CRC (check file cyclic redundancy) dùng để check lỗi bất ngờ của data dc truyền đi hay lưu trữ, file Json dùng để lưu trữ tất cả crud quy trình, tất cả metadata
++ delta logs lưu trữ tất cả chỉnh sửa,tất cả data version, khi chúng ta truy vấn delta table nó sẽ lấy the latest version 
++ check versioning của table bằng lệnh describe history gold.trip_zone
++ time travel dùng để roll back lại version trc đó, dùng lệnh restore gold.trip_zone to version as of 0
+
+Connecting to power BI---
++ Vào phần partner connect, download connection file ( create 1 empty power bi workspace)
++ Mở file connect lên, nhập accesss token từ databrick

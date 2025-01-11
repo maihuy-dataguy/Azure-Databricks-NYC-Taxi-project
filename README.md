@@ -15,5 +15,5 @@ The project is designed with the following components:
     - silver layer: used for storing transformed data (parquet format) through spark using databrick notebook.
     - gold layer: Used for storing transformed (delta format), creating delta tables on top of data, thanks to transactional log created from delta lake, using sql (sparkSQL) to query data for  auditing, reports in combination with data versioning and time travel to enhance ACID features and data integrity in azure data lake.
 - **Power BI**: For creating dashboards to support related reports. 
-
+- **Securiy**: Using secret key, grant access service princle as storage data contributor
 

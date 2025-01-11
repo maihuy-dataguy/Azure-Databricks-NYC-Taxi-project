@@ -9,7 +9,7 @@ This project serves as a comprehensive implementation to building an end-to-end 
 The project is designed with the following components:
 
 - **Data Source**: We use 2 files taxi_zone_lookup.csv and trip_type.csv alongside with NYC-Taxi trip data API from `https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page` for our pipeline.
-- **Azure Data Factory (ADF)**: Responsible for ingesting data and storing fetched data in azure data lakehouse at bronze layer.
+- **Azure Data Factory (ADF)**: Responsible for ingesting data and storing fetched data in azure data lakehouse at bronze layer, implenmenting parameterized pipeline to fully fetch 12-months data in 2023.
 - **Databricks Lakehouse**: Using medallion architecture, we transfer our data between these layers including bronze, silver, gold layers
     - Bronze layer: Used for storing raw data ingested from ADF.
     - silver layer: used for storing transformed data (parquet format) through spark using databrick notebook.
